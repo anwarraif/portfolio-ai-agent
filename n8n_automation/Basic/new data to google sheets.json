@@ -1,0 +1,166 @@
+{
+  "name": "new data to google sheets",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -440,
+        -40
+      ],
+      "id": "ec544c78-44bd-463f-bf79-649fdfd4459a",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c7aa8b0f-80da-42b2-a0b6-1e1465007f7f",
+              "name": "message",
+              "value": "test from n8n",
+              "type": "string"
+            },
+            {
+              "id": "c997a36a-dc63-4863-be41-e76aecb63923",
+              "name": "sender",
+              "value": "revaldi",
+              "type": "string"
+            },
+            {
+              "id": "d5044488-6bdf-4a86-9c96-a46cd79f3e6e",
+              "name": "execution time",
+              "value": "={{ new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta'}) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -220,
+        -120
+      ],
+      "id": "86e43cd9-da65-454f-9245-0239a43b851e",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1kxoataqiFd9cN3ScH862rog1xzKNW_9rfr9t32_ikvY",
+          "mode": "list",
+          "cachedResultName": "Data from n8n",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kxoataqiFd9cN3ScH862rog1xzKNW_9rfr9t32_ikvY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kxoataqiFd9cN3ScH862rog1xzKNW_9rfr9t32_ikvY/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Automation message": "={{ $json.message }}",
+            "Sender": "={{ $json.sender }}",
+            "Execution time": "={{$json['execution time']}}"
+          },
+          "matchingColumns": [
+            "Automation message"
+          ],
+          "schema": [
+            {
+              "id": "Automation message",
+              "displayName": "Automation message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Sender",
+              "displayName": "Sender",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Execution time",
+              "displayName": "Execution time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        0,
+        -40
+      ],
+      "id": "ca8767b3-5a7f-40fe-b566-a3586253190b",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "blsRSg59mZqI2ray",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "8b7bc4dc-2e2f-4a5f-b29e-5260302af942",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "53c3b0b10a94cb0015d552201e4ede67672921d8999aac0c5a1beebbb79dfed4"
+  },
+  "id": "LglNspuexNmCCRu1",
+  "tags": []
+}

@@ -1,0 +1,1202 @@
+{
+  "name": "campaign marketing",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "={{ $('Settings').item.json.sheet_url }}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Sheet1",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {
+            "row_number": 0,
+            "email": "={{$json.email}}",
+            "name": "={{$json.name}}",
+            "company": "={{$json.company}}",
+            "first_emailed": "={{$json.first_emailed}}"
+          },
+          "matchingColumns": [
+            "email"
+          ],
+          "schema": [
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "company",
+              "displayName": "company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "first_emailed",
+              "displayName": "first_emailed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "9e1121e5-4d09-4dad-b433-fd51f2fb219a",
+      "name": "Update last contacted time",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        1024,
+        240
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "OEgCIwHkmWpjo9eu",
+          "name": "fullstack"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fields": {
+          "values": [
+            {
+              "name": "message_template",
+              "stringValue": "={{ $('Email sequence').first().json.emails[0].message }}"
+            },
+            {
+              "name": "email",
+              "stringValue": "fullstackoverflow401@gmail.com"
+            },
+            {
+              "name": "name",
+              "stringValue": "Revaldi"
+            },
+            {
+              "name": "company",
+              "stringValue": "Davey Enterprises"
+            },
+            {
+              "name": "subject",
+              "stringValue": "={{ $('Settings').item.json.subject }}"
+            },
+            {
+              "name": "sender_name",
+              "stringValue": "={{ $('Settings').item.json.sender_name }}"
+            },
+            {
+              "name": "mail_id",
+              "stringValue": "={{ $('Settings').item.json.mail_id }}"
+            },
+            {
+              "name": "mail_seq",
+              "stringValue": "0"
+            }
+          ]
+        },
+        "include": "none",
+        "options": {}
+      },
+      "id": "0205c928-aa45-4ffc-ab54-a4d106ff1340",
+      "name": "Set message template",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        144,
+        1232
+      ],
+      "typeVersion": 3.2,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"emails\": [\n    {\n      \"message\": \"Hai {name}, semoga kamu baik-baik saja!<br />\\n<br />\\nKamu melakukan hal-hal hebat di {company}, dan saya ingin menghubungi untuk melihat apakah kamu tertarik untuk berbincang.<br />\\n<br />\\nApakah masuk akal jika kita mengatur panggilan singkat?<br />\\n<br />\\nSalam,<br />\\n<br />\\nRevaldi<br />\\n\",\n      \"send_on_day\": 0\n    },\n    {\n      \"message\": \"Hai {name},<br />\\n<br />\\nHanya ingin menindaklanjuti hal ini, karena akan menyenangkan jika kita bisa berbicara.<br />\\n<br />\\nSalam,<br />\\n<br />\\nRevaldi<br />\\n\",\n      \"send_on_day\": 3\n    },\n    {\n      \"message\": \"Saya hanya ingin mencoba sekali lagi :)<br />\\n<br />\\nRevaldi\\n\",\n      \"send_on_day\": 8\n    }\n  ]\n}",
+        "options": {}
+      },
+      "id": "b4e2c213-b279-4143-b013-a1ecf1d91274",
+      "name": "Email sequence",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -352,
+        240
+      ],
+      "typeVersion": 3.2
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// --- Util: ambil daftar placeholder di template {name}, {company}, dst\nfunction extractPlaceholders(str = '') {\n  const regex = /\\{([a-zA-Z0-9_-]+)\\}/g;\n  const unique = new Set();\n  let m;\n  while ((m = regex.exec(String(str))) !== null) unique.add(m[1]);\n  return Array.from(unique);\n}\n\n// Ambil payload saat ini\nconst data = item.json || {};\n\n// Template pesan\nconst template = (data.message_template ?? '').toString();\n\n// Safety: pastikan template ada\nif (!template) {\n  throw new Error(\"message_template kosong. Pastikan field 'message_template' dikirim dari parent workflow.\");\n}\n\n// Bangun sumber nilai placeholder:\n// 1) Jika ada item.json.placeholders (object), pakai itu.\n// 2) Jika tidak ada, ambil dari field-field yang namanya sama dengan placeholder di template.\nlet source = {};\nif (data.placeholders && typeof data.placeholders === 'object' && data.placeholders !== null) {\n  source = data.placeholders;\n} else {\n  source = {};\n  for (const key of Object.keys(data)) {\n    // lewati field non-konten\n    if (['message_template', 'subject', 'row_number', 'reply_message_id'].includes(key)) continue;\n    source[key] = data[key];\n  }\n}\n\n// Replace semua placeholder yang terdeteksi di template\nlet result = template;\nconst neededKeys = extractPlaceholders(template);\n\nfor (const key of neededKeys) {\n  // Prioritas nilai: source[key] (dari placeholders) atau data[key] (langsung dari input)\n  let value = source[key];\n  if (value === undefined || value === null) value = data[key];\n\n  if (value === undefined || value === null) {\n    // Jika ingin fail-hard, uncomment baris di bawah:\n    // throw new Error(`Missing data for placeholder '{${key}}'`);\n    // Default: biarkan placeholder tetap apa adanya (tidak dihapus), hanya beri log\n    console.warn(`Missing value for {${key}}; placeholder dibiarkan apa adanya.`);\n    continue;\n  }\n\n  const regex = new RegExp(`\\\\{${key}\\\\}`, 'g');\n  result = result.replace(regex, String(value));\n}\n\n// Simpan hasil ke item.json.message\nitem.json.message = result;\n\nreturn item;"
+      },
+      "id": "f7f982b4-68f5-43a7-bd15-8350b3171ee0",
+      "name": "Fill message placeholders",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        368,
+        1232
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "fields": {
+          "values": [
+            {
+              "name": "message",
+              "stringValue": "=<span data-cam='{{ $json.mail_id }}' data-seq='{{ $json.mail_seq }}' data-ph='{{ JSON.stringify($json.placeholders) }}'></span>{{ $json.message }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "99aa29dd-f9ae-4863-a3a2-4ca1e7263646",
+      "name": "Compose message",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        592,
+        1232
+      ],
+      "typeVersion": 3.2
+    },
+    {
+      "parameters": {
+        "resource": "thread",
+        "returnAll": true,
+        "filters": {
+          "q": "=subject:{{ $json.subject }} after:{{ $now.minus({'days': $json.emails.last().send_on_day+1}).toSQL().substr(0, 10) }}"
+        }
+      },
+      "id": "47de36db-a085-4f4c-a723-e3ef3fdbd35e",
+      "name": "Get previous message threads",
+      "type": "n8n-nodes-base.gmail",
+      "position": [
+        -80,
+        720
+      ],
+      "typeVersion": 2.1,
+      "webhookId": "847febbe-caad-4cea-baf4-529168a13715",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "bjaEyPeCxjkUZR9e",
+          "name": "Gmail account fullstack"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "thread",
+        "operation": "get",
+        "threadId": "={{ $json.id }}",
+        "simple": false,
+        "options": {}
+      },
+      "id": "535c5fe5-40e9-4b81-9cb4-afc83853dab9",
+      "name": "Get thread details",
+      "type": "n8n-nodes-base.gmail",
+      "position": [
+        144,
+        720
+      ],
+      "typeVersion": 2,
+      "webhookId": "440a9f16-c199-43ae-a191-f5664094ca21",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "bjaEyPeCxjkUZR9e",
+          "name": "Gmail account fullstack"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Because emails are sent slightly after the schedule trigger runs, we'll end up waiting an extra day to send unless we take into account the execution time of the workflow\nlet buffer_mins = 20\n\nlet templates = $('Email sequence').first().json.emails\n\nfunction next_sequence_number(messages, mail_id, sender_name) {\n  for (let i = 0; i < messages.length; i++) {\n    if(!('html' in messages[i])) return -1;\n    let in_campaign = messages[i].html.includes(\"data-cam='\"+mail_id+\"'\")\n    let valid_seq = messages[i].html.includes(\"data-seq='\"+i+\"'\")\n    let from_us = messages[i].From.includes(sender_name)\n    console.log(in_campaign + \", \" + valid_seq + \", \" + from_us)\n    if(!(from_us && in_campaign && valid_seq)) {\n      return -1;\n    }\n  }\n  return messages.length;\n}\n\n\nfor (const item of $input.all()) {\n  item.json.first_message_at = DateTime.fromMillis($('Get thread details').item.json.messages[0].internalDate*1)\n  item.json.days_since_first_message = DateTime.now().diff(item.json.first_message_at, 'days').days\n  item.json.next_sequence_number = next_sequence_number(\n    item.json.messages,\n    $('Settings').first().json.mail_id,\n    $('Settings').first().json.sender_name\n  );\n  item.json.next_message_due = (\n    item.json.next_sequence_number > 0\n    && item.json.next_sequence_number < templates.length\n    && templates[item.json.next_sequence_number].send_on_day <= item.json.days_since_first_message + (buffer_mins/60/24)\n  )\n\n  // Retrieve the placeholder values from the snippet, for use in future messages\n  const ph_matches = item.json.messages[0].snippet.match(/data-ph='([^']*)'/)\n  if(ph_matches?.length > 1) {\n    const placeholders = JSON.parse(ph_matches[1])\n    for(key of placeholders.keys()) {\n      item.json[key] = placeholders[key]\n    }\n  }\n\n}\n\nreturn $input.all();"
+      },
+      "id": "8370a531-7948-4041-ac07-fb09a3b377b6",
+      "name": "Classify threads",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        592,
+        720
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "00cf6401-f45a-4496-803c-70a5b2d7daf5",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              },
+              "leftValue": "={{ $json.next_message_due }}",
+              "rightValue": ""
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "e398220d-3281-4859-8c7f-3f71df0a5c7a",
+      "name": "Next message due?",
+      "type": "n8n-nodes-base.filter",
+      "position": [
+        800,
+        720
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "content": "Tindak lanjut wajib dilakukan jika:\n- Semua pesan di utas bersifat otomatis (belum ada yang membalas)\n- Waktu yang cukup telah berlalu untuk mengirim pesan berikutnya",
+        "height": 344.96230939963334,
+        "width": 181.66573318934627,
+        "color": 7
+      },
+      "id": "d1e8af66-b4a6-45a5-ab52-d1a618a55c77",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        544,
+        512
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "dc8ec88f-daef-46be-b3da-1407d5e1c0b1",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              },
+              "leftValue": "={{ $json.reply_message_id }}",
+              "rightValue": ""
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "241e9df7-39f1-4c0f-a621-c292f8514825",
+      "name": "Replying?",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        800,
+        1232
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.to_email || $json.email || 'revaldi.anggara@patriaco.id' }}",
+        "subject": "={{ $json.subject }}",
+        "message": "={{ $json.message }}",
+        "options": {
+          "appendAttribution": false,
+          "senderName": "={{ $json.sender_name }}"
+        }
+      },
+      "id": "f8942a7e-9011-4146-ae25-293284705aa4",
+      "name": "Send new message",
+      "type": "n8n-nodes-base.gmail",
+      "position": [
+        1024,
+        1344
+      ],
+      "typeVersion": 2.1,
+      "webhookId": "12cfe14b-d02e-4e88-a8d3-0459747c2dd0",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "bjaEyPeCxjkUZR9e",
+          "name": "Gmail account fullstack"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": "={{ $workflow.id }}",
+        "mode": "each",
+        "options": {}
+      },
+      "id": "8beba1a0-faae-4c66-a2d9-377bd2893eed",
+      "name": "Call message send sub-workflow",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "position": [
+        1472,
+        720
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "fields": {
+          "values": [
+            {
+              "name": "message_template",
+              "stringValue": "={{ $('Email sequence').first().json.emails[$json.next_sequence_number].message }}"
+            },
+            {
+              "name": "reply_message_id",
+              "stringValue": "={{ $json.messages.last().id }}"
+            },
+            {
+              "name": "sender_name",
+              "stringValue": "={{ $('Settings').item.json.sender_name }}"
+            },
+            {
+              "name": "mail_id",
+              "stringValue": "={{ $('Settings').item.json.mail_id }}"
+            },
+            {
+              "name": "mail_seq",
+              "stringValue": "={{ $json.next_sequence_number }}"
+            },
+            {
+              "name": "to",
+              "stringValue": "={{ $json.messages[0].To }}"
+            }
+          ]
+        },
+        "include": "none",
+        "options": {}
+      },
+      "id": "5d1be667-3cd2-45ec-a2b5-89bff0a4b5d6",
+      "name": "Prepare reply params",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        1024,
+        720
+      ],
+      "typeVersion": 3.2
+    },
+    {
+      "parameters": {
+        "fields": {
+          "values": [
+            {
+              "name": "message_template",
+              "stringValue": "={{ $('Email sequence').first().json.emails[0].message }}"
+            },
+            {
+              "name": "to_email",
+              "stringValue": "={{ $('Get emails').item.json[$('Settings').item.json.email_column_name] }}"
+            },
+            {
+              "name": "subject",
+              "stringValue": "={{ $('Settings').item.json.subject }}"
+            },
+            {
+              "name": "sender_name",
+              "stringValue": "={{ $('Settings').item.json.sender_name }}"
+            },
+            {
+              "name": "mail_seq",
+              "stringValue": "0"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "724b42ad-d11d-4db4-b3b9-ff19b170f7e0",
+      "name": "Prepare first message params",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        368,
+        240
+      ],
+      "typeVersion": 3.2
+    },
+    {
+      "parameters": {
+        "content": "Kolom yang dibutuhkan\n- email\n- first_emailed (kosongkan - akan terisi otomatis)\n- Kolom lain yang sesuai dengan placeholder dalam urutan email",
+        "height": 410.4105111871959,
+        "width": 181.66573318934627,
+        "color": 7
+      },
+      "id": "8a736994-4888-4463-9c1c-71c240478f00",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -112,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "eeec5901-5ff0-47b1-926b-e93097d64434",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              },
+              "leftValue": "={{ $json.first_emailed.isEmpty() }}",
+              "rightValue": ""
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "fee8aea6-7c7e-47c5-ae07-46f7e2ccdbc9",
+      "name": "To email?",
+      "type": "n8n-nodes-base.filter",
+      "position": [
+        144,
+        240
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "jsCode": "// TODO: Some messages have an empty payload and a parts field instead (containing an array)\n\nfor (const item of $input.all()) {\n  for (const message of item.json.messages) {\n    console.log('message', message.payload.body.data || \"\")\n    let buffer = Buffer.from(message.payload.body.data || \"\", \"base64\");\n    message.html = buffer.toString(\"utf8\")\n  }\n}\n\nreturn $input.all();"
+      },
+      "id": "561b8247-ab47-4fc9-8e69-a9ea71f1fff1",
+      "name": "Decode messages",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        368,
+        720
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const html = $('Decode messages').item.json.messages[0].html\nconst matches = html.match(/data-ph='([^']*)'/)\nlet placeholders = {}\nif(matches?.length > 0) {\n  ph = JSON.parse(matches[1])\n  for(k of Object.keys(ph)) {\n    placeholders[k] = ph[k]\n  }\n}\nitem.json.placeholders = placeholders\n\nreturn item;"
+      },
+      "id": "30a17cc6-aae3-40d8-a410-7b1622f3b8c2",
+      "name": "Decode placeholder values",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        1248,
+        720
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "function extractPlaceholders(str) {\n    // Regular expression to match placeholders\n    // It matches any alphanumeric character including dashes and underscores between {}\n    const regex = /\\{([a-zA-Z0-9_-]+)\\}/g;\n    \n    // Set to store unique placeholders\n    const uniquePlaceholders = new Set();\n\n    // Extract and store unique placeholders\n    let match;\n    while ((match = regex.exec(str)) !== null) {\n        uniquePlaceholders.add(match[1]);\n    }\n\n    // Convert the Set to an array and return\n    return Array.from(uniquePlaceholders);\n}\n\n\n// Gather all the placeholder values for passing on\nconst all_ph_raw = $('Email sequence').first().json.emails.flatMap(e => extractPlaceholders(e.message))\nconst all_ph = [...new Set(all_ph_raw)];\nlet placeholders = {}\nfor(ph of all_ph) {\n  if($('Get emails').item.json[ph] == undefined) throw new Error(`Message placeholder '{${ph}}' requires a column called '${ph}' in the Google Sheet`)\n  placeholders[ph] = $('Get emails').item.json[ph]\n}\n\nitem.json.placeholders = placeholders\n\nreturn item;"
+      },
+      "id": "12fe8119-d70c-4022-96d7-e14f2b727266",
+      "name": "Package placeholder values",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        592,
+        240
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5e327a1d-3f2e-40f1-aaa1-9ce888349eb0",
+              "name": "sheet_url",
+              "type": "string",
+              "value": "https://docs.google.com/spreadsheets/d/12URQADSrb8qVOKxPD8VFipWyPW5tecWys3qci-QhlaE/edit?usp=sharing"
+            },
+            {
+              "id": "3255270a-3ac2-4c59-8215-ea79256b55cc",
+              "name": "subject",
+              "type": "string",
+              "value": "Marketing Campaign Patria&Co"
+            },
+            {
+              "id": "76b40b74-acef-49f1-a0e2-0be9a461319a",
+              "name": "sender_name",
+              "type": "string",
+              "value": "Revaldi"
+            },
+            {
+              "id": "4532eb84-5ebc-4011-8c65-d97aeae21256",
+              "name": "email_column_name",
+              "type": "string",
+              "value": "email"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d38980f5-d3ef-4a51-bb15-c8466c2afbce",
+      "name": "Settings",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -576,
+        240
+      ],
+      "typeVersion": 3.3
+    },
+    {
+      "parameters": {
+        "operation": "reply",
+        "messageId": "{{ ($json.reply_message_id || '').toString() }}",
+        "message": "={{ $json.message }}",
+        "options": {
+          "senderName": "David Roberts"
+        }
+      },
+      "id": "38242788-c1ec-4105-a620-e83b34fa043f",
+      "name": "Reply to message",
+      "type": "n8n-nodes-base.gmail",
+      "position": [
+        1024,
+        1120
+      ],
+      "typeVersion": 2,
+      "webhookId": "7ffabf9c-6b60-433f-a9b3-508fad128f3e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "bjaEyPeCxjkUZR9e",
+          "name": "Gmail account fullstack"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "={{ $('Settings').item.json.sheet_url }}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Sheet1",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "id": "8858e478-ea9c-473e-8618-fa1578ca858e",
+      "name": "Get emails",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        -80,
+        240
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "OEgCIwHkmWpjo9eu",
+          "name": "fullstack"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Kirim email awal",
+        "height": 515.1374038700677,
+        "width": 1790.5345476157208,
+        "color": 7
+      },
+      "id": "7e97d511-1e68-4bba-9025-6de78e0e9796",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -128,
+        -80
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Kirim email tindak lanjut jika sesuai",
+        "height": 515.1374038700677,
+        "width": 1797.4980261229769,
+        "color": 7
+      },
+      "id": "47928b5b-bca7-432f-ae09-e17d905c9e06",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -128,
+        464
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Sub-alur kerja untuk mengirim email",
+        "height": 515.1374038700677,
+        "width": 1797.4980261229769,
+        "color": 7
+      },
+      "id": "b11a818a-d0a2-4e77-bc31-efb7a68dec74",
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -128,
+        1024
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "triggerAtMinute": 12
+            }
+          ]
+        }
+      },
+      "id": "796d450e-e574-477e-9c44-80c2c609bd25",
+      "name": "Every hour",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [
+        -1040,
+        240
+      ],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "content": "Jika reply_message_id diatur, pesan tersebut akan dibalas.\n\nJika tidak, pesan baru akan dikirim kepada pengguna di kolom 'email'.",
+        "height": 306.5470605243249,
+        "width": 181.66573318934627,
+        "color": 7
+      },
+      "id": "f6469178-f929-4603-8528-62e8ee29e2ea",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        768,
+        1040
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "195ce0cf-9d25-4e02-9f20-aa6edbc2d561",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              },
+              "leftValue": "={{ $now.isWeekend() }}",
+              "rightValue": ""
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "44e539d7-7aa8-4bd0-9819-c1b07f46127c",
+      "name": "Don't email on weekends",
+      "type": "n8n-nodes-base.filter",
+      "position": [
+        -816,
+        240
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "content": "# Flow\n1. download [google sheet ini](https://docs.google.com/spreadsheets/d/1HNQpHncAnKZzHKpgE6CrKvxFhdasGYHy/edit?gid=1315209937#gid=1315209937) dan update 'Pengaturan' dengan URL-nya (serta ubah pengaturan lain yang diperlukan)\n2. Sesuaikan urutan email yang ingin Anda kirim di node 'Urutan Email'\n\nPastikan Anda mengatur berapa hari setelah email sebelumnya untuk menunggu sebelum mengirim, dan perhatikan bahwa email tersebut dalam format HTML.",
+        "height": 418.96364526464185,
+        "width": 404.04123613412946
+      },
+      "id": "955b5a22-5aba-4886-82f7-59b37387bd0c",
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -608,
+        -16
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "row_number",
+              "type": "number"
+            },
+            {
+              "name": "email"
+            },
+            {
+              "name": "name"
+            },
+            {
+              "name": "company"
+            },
+            {
+              "name": "to_email"
+            },
+            {
+              "name": "message_template"
+            },
+            {
+              "name": "subject"
+            },
+            {
+              "name": "sender_name"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -16,
+        1232
+      ],
+      "id": "7abf63cb-6841-4c8a-8b47-83fcd5a74680",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "v6rxvgdsRsKOOUaR",
+          "mode": "list",
+          "cachedResultName": "campaign marketing"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $json.row_number }}",
+            "email": "={{$json.email}}",
+            "company": "={{$json.company}}",
+            "name": "={{$json.name}}",
+            "to_email": "={{$json.to_email}}",
+            "message_template": "={{$json.message_template}}",
+            "subject": "={{$json.subject}}",
+            "sender": "={{$json.sender_name}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "company",
+              "displayName": "company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "to_email",
+              "displayName": "to_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "message_template",
+              "displayName": "message_template",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "subject",
+              "displayName": "subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "sender",
+              "displayName": "sender",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        816,
+        240
+      ],
+      "id": "72f32e01-3f62-4ede-83e9-977ffd80e839",
+      "name": "Execute Workflow"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Settings": {
+      "main": [
+        [
+          {
+            "node": "Email sequence",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Replying?": {
+      "main": [
+        [
+          {
+            "node": "Reply to message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send new message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "To email?": {
+      "main": [
+        [
+          {
+            "node": "Prepare first message params",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Every hour": {
+      "main": [
+        [
+          {
+            "node": "Don't email on weekends",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get emails": {
+      "main": [
+        [
+          {
+            "node": "To email?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email sequence": {
+      "main": [
+        [
+          {
+            "node": "Get previous message threads",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get emails",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compose message": {
+      "main": [
+        [
+          {
+            "node": "Replying?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Decode messages": {
+      "main": [
+        [
+          {
+            "node": "Classify threads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classify threads": {
+      "main": [
+        [
+          {
+            "node": "Next message due?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Next message due?": {
+      "main": [
+        [
+          {
+            "node": "Prepare reply params",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get thread details": {
+      "main": [
+        [
+          {
+            "node": "Decode messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare reply params": {
+      "main": [
+        [
+          {
+            "node": "Decode placeholder values",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set message template": {
+      "main": [
+        [
+          {
+            "node": "Fill message placeholders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Don't email on weekends": {
+      "main": [
+        [
+          {
+            "node": "Settings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Decode placeholder values": {
+      "main": [
+        [
+          {
+            "node": "Call message send sub-workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fill message placeholders": {
+      "main": [
+        [
+          {
+            "node": "Compose message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Package placeholder values": {
+      "main": [
+        [
+          {
+            "node": "Execute Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get previous message threads": {
+      "main": [
+        [
+          {
+            "node": "Get thread details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare first message params": {
+      "main": [
+        [
+          {
+            "node": "Package placeholder values",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Set message template",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow": {
+      "main": [
+        [
+          {
+            "node": "Update last contacted time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "cb694ca5-d8a0-4d53-ad57-742ef3148de8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6ecec6629adf453df08d487fa10f1c287ae1bcb8e85c1bdf858a8203f602f7c6"
+  },
+  "id": "v6rxvgdsRsKOOUaR",
+  "tags": []
+}

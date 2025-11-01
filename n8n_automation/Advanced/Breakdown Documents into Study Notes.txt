@@ -1,0 +1,1201 @@
+{
+  "name": "Breakdown Documents into Study Notes",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "9d96a0bf-52ec-4e26-b5dc-a351ab8997ad",
+      "name": "Local File Trigger",
+      "type": "n8n-nodes-base.localFileTrigger",
+      "position": [
+        -2416,
+        208
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "jsonMode": "expressionData",
+        "jsonData": "={{ $json.data }}",
+        "options": {
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "project",
+                "value": "={{ $('Settings').item.json.project }}"
+              },
+              {
+                "name": "filename",
+                "value": "={{ $('Settings').item.json.filename }}"
+              }
+            ]
+          }
+        }
+      },
+      "id": "bc13c75c-b8e2-48c9-9f5f-46b571cf5b3b",
+      "name": "Default Data Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "position": [
+        -1264,
+        656
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "chunkSize": 2000,
+        "options": {}
+      },
+      "id": "ee535f2a-02e1-4328-a815-833cebc6a497",
+      "name": "Recursive Character Text Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "position": [
+        -1264,
+        800
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "38551989-3803-4fa0-b9e5-abf871d85a21",
+      "name": "Embeddings Mistral Cloud",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsMistralCloud",
+      "position": [
+        -1376,
+        656
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "model": "open-mixtral-8x7b",
+        "options": {}
+      },
+      "id": "271a2cbf-04dd-44a8-9683-cb30f89f6ee3",
+      "name": "Mistral Cloud Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatMistralCloud",
+      "position": [
+        112,
+        784
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "model": "open-mixtral-8x7b",
+        "options": {}
+      },
+      "id": "b73763ca-1fbb-4401-a48d-6124d54e5bcb",
+      "name": "Mistral Cloud Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatMistralCloud",
+      "position": [
+        -1360,
+        336
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "da64ffde-1e8f-478d-baea-59fc05e6d3ce",
+              "name": "data",
+              "type": "string",
+              "value": "={{ $json.text }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ae251afc-7b5f-4944-b2f8-aa764c3c1f63",
+      "name": "Prep Incoming Doc",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -1664,
+        368
+      ],
+      "typeVersion": 3.3
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "df327b01-961c-4a49-8455-58c3fbff111a",
+              "name": "project",
+              "type": "string",
+              "value": "={{ $json.path.split('/').slice(0, 4)[3] }}"
+            },
+            {
+              "id": "6b7d26f9-3a38-417e-85d0-4e9d42476465",
+              "name": "path",
+              "type": "string",
+              "value": "={{ $json.path }}"
+            },
+            {
+              "id": "bb4471c7-d894-4739-99a6-4be247794ffa",
+              "name": "filename",
+              "type": "string",
+              "value": "={{ $json.path.split('/').last() }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ba3ceab0-1262-40d0-8717-1e10815c5a90",
+      "name": "Settings",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -2240,
+        208
+      ],
+      "typeVersion": 3.3
+    },
+    {
+      "parameters": {
+        "mode": "chooseBranch"
+      },
+      "id": "bb7069fc-20b0-4375-a143-2006960fe60d",
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "position": [
+        -960,
+        368
+      ],
+      "typeVersion": 2.1
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n \"docs\": [\n {\n \"filename\": \"study_guide.md\",\n \"title\": \"Study Guide\",\n \"description\": \"A Study Guide is a consolidated resource designed to aid learning. This guide includes three key elements: * A short answer quiz accompanied by an answer key to test comprehension. * A curated list of long-form essay questions to encourage deeper analysis and synthesis of the material. * A glossary of key terms to reinforce understanding of important concepts.\"\n },\n {\n \"filename\": \"timeline.md\",\n \"title\": \"Timeline\",\n \"description\": \"A Timeline organizes all significant events described in the sources you have uploaded in chronological order. This ordered list makes it easier to understand the sequence of events and their connection to the broader context of your sources. In addition to the list of events, the Timeline also provides a “cast of characters,” which comprises short biographical sketches of all the important people mentioned in your uploaded sources. These short biographies can help you quickly grasp the roles of various individuals involved in the events described by the Timeline.\"\n },\n {\n \"filename\": \"briefing_doc.md\",\n \"title\": \"Briefing Doc\",\n \"description\": \"A Briefing Doc identifies and presents the most important facts and insights from the sources in an easy-to-understand outline format. This format is designed to provide a concise overview of the key takeaways from the uploaded materials.\"\n }\n ]\n}\n",
+        "options": {}
+      },
+      "id": "e7374ddb-77cb-46e2-8c99-0ee9d239aecd",
+      "name": "Get Doc Types",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -560,
+        368
+      ],
+      "executeOnce": true,
+      "typeVersion": 3.3
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "docs",
+        "options": {}
+      },
+      "id": "acf8fbda-9f66-4262-9d68-9a1db70e1edd",
+      "name": "Split Out Doc Types",
+      "type": "n8n-nodes-base.splitOut",
+      "position": [
+        -400,
+        368
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "a0c13ee6-f416-48e1-b157-98ff77957c67",
+      "name": "For Each Doc Type...",
+      "type": "n8n-nodes-base.splitInBatches",
+      "position": [
+        -224,
+        368
+      ],
+      "typeVersion": 3
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "113e9872-8303-46fa-9462-ae8801aec20f",
+      "name": "Item List Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserItemList",
+      "position": [
+        288,
+        784
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {},
+      "id": "8cdf3916-0c6d-453c-b98a-5b295c76330f",
+      "name": "Vector Store Retriever",
+      "type": "@n8n/n8n-nodes-langchain.retrieverVectorStore",
+      "position": [
+        640,
+        784
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "d0bcced9-2e3f-4ae2-a56f-fc06f9700509",
+      "name": "Embeddings Mistral Cloud1",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsMistralCloud",
+      "position": [
+        640,
+        1008
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "qdrantCollection": {
+          "__rl": true,
+          "mode": "list",
+          "value": "storynotes",
+          "cachedResultName": "storynotes"
+        },
+        "options": {}
+      },
+      "id": "d44ec3f7-9afb-4b0f-bd21-e4522068c50b",
+      "name": "Qdrant Vector Store1",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "position": [
+        640,
+        880
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "40b52524-e2c4-4689-b735-0d41841e85d8",
+      "name": "Mistral Cloud Chat Model2",
+      "type": "@n8n/n8n-nodes-langchain.lmChatMistralCloud",
+      "position": [
+        544,
+        784
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "response",
+        "options": {}
+      },
+      "id": "1acec0a1-07ea-4a98-81e0-a6c3303677b8",
+      "name": "Split Out",
+      "type": "n8n-nodes-base.splitOut",
+      "position": [
+        400,
+        624
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "response.text"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e9e4fcf4-d5f0-4b10-abbd-2e1365fce505",
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "position": [
+        848,
+        624
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "model": "open-mixtral-8x7b",
+        "options": {}
+      },
+      "id": "81e1d231-82b8-4541-841a-c3560166bffc",
+      "name": "Mistral Cloud Chat Model3",
+      "type": "@n8n/n8n-nodes-langchain.lmChatMistralCloud",
+      "position": [
+        992,
+        784
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.response }}",
+        "options": {}
+      },
+      "id": "96142829-e17f-4432-9c63-ee655186041e",
+      "name": "Discover",
+      "type": "@n8n/n8n-nodes-langchain.chainRetrievalQa",
+      "position": [
+        544,
+        624
+      ],
+      "typeVersion": 1.3
+    },
+    {
+      "parameters": {},
+      "id": "fcaf50fb-7f25-4dfc-8afd-61a4e6d25967",
+      "name": "2secs",
+      "type": "n8n-nodes-base.wait",
+      "position": [
+        1328,
+        1008
+      ],
+      "webhookId": "ec58ab18-03c5-4b58-bc2e-24415a236c72",
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b38546b2-47c4-4967-a2d7-98aebd589e95",
+              "name": "data",
+              "type": "string",
+              "value": "={{ $json.text }}"
+            },
+            {
+              "id": "a263519a-aa05-410a-b4f0-f5e22cc5058c",
+              "name": "path",
+              "type": "string",
+              "value": "={{ $('Prep For AI').item.json.path }}"
+            },
+            {
+              "id": "ec1687d6-0ea9-460f-b9d4-ae4a7e229e12",
+              "name": "filename",
+              "type": "string",
+              "value": "={{ $('Prep For AI').item.json.name }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ab6015d1-ab32-4492-9395-6933c07f689a",
+      "name": "Get Generated Documents",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        128,
+        176
+      ],
+      "typeVersion": 3.3
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=## Document\n{{ $json.text.join('\\n') }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=Your job is to create a {{ $('For Each Doc Type...').item.json.title }} for the given document. {{ $('For Each Doc Type...').item.json.description }}\n\nGenerate a {{ $('For Each Doc Type...').item.json.title }} for the given document. If questions are generated, generate the answers alongside them. Format your response in markdown; use \"#\" to format headings, use \"*\" to format lists."
+            }
+          ]
+        }
+      },
+      "id": "b4d7ce47-1c24-4910-96fd-223c4a8ac83d",
+      "name": "Generate",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "position": [
+        992,
+        624
+      ],
+      "typeVersion": 1.4
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5c864125-c884-4d33-b0ed-e3eecd354196",
+              "name": "id",
+              "type": "string",
+              "value": "={{ $('Settings').first().json.filename.hash() }}"
+            },
+            {
+              "id": "93ac14c1-ae97-4ef2-a66f-6c1110f3b0fc",
+              "name": "project",
+              "type": "string",
+              "value": "={{ $('Settings').first().json.project }}"
+            },
+            {
+              "id": "fafd16b9-0002-4f7c-89d0-29788f8ec472",
+              "name": "path",
+              "type": "string",
+              "value": "={{ $('Settings').first().json.path }}"
+            },
+            {
+              "id": "5a5860ba-918b-4fb8-b18c-96c1cd22091a",
+              "name": "name",
+              "type": "string",
+              "value": "={{ $('Settings').first().json.filename }}"
+            },
+            {
+              "id": "1a1caf65-85d8-4f74-a3be-503ccfc0b2c9",
+              "name": "summary",
+              "type": "string",
+              "value": "={{ $('Summarization Chain').first().json.response.text }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7bd244b1-d4da-4a0a-9ba4-32d110b65969",
+      "name": "Prep For AI",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -800,
+        368
+      ],
+      "typeVersion": 3.3
+    },
+    {
+      "parameters": {
+        "operation": "toText",
+        "sourceProperty": "={{ $json.data }}",
+        "options": {}
+      },
+      "id": "1095e810-d229-4bca-877f-3d0aae66273e",
+      "name": "To Binary",
+      "type": "n8n-nodes-base.convertToFile",
+      "position": [
+        304,
+        176
+      ],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "={{\n $('Get Generated Documents').item.json.path.replace(\n $('Get Generated Documents').item.json.path.split('/').last(),\n $('Get Generated Documents').item.json.filename.substring(0,21) + '...' + $('Split Out Doc Types').item.json.title + '.md'\n )\n}}",
+        "options": {}
+      },
+      "id": "1d87a1c3-5909-4ff0-b939-4d746c131c14",
+      "name": "Export to Folder",
+      "type": "n8n-nodes-base.readWriteFile",
+      "position": [
+        464,
+        176
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "leftValue": "={{ $json.fileType }}",
+                    "rightValue": "pdf"
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "pdf"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "3a5f509d-46fe-490c-95f0-35124873c63e",
+                    "operator": {
+                      "name": "filter.operator.equals",
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "leftValue": "={{ $json.fileType }}",
+                    "rightValue": "docx"
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "docx"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "75188d2f-4bea-44ea-a579-9b9a1bd1ea93",
+                    "operator": {
+                      "type": "object",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "leftValue": "={{ $json }}",
+                    "rightValue": ""
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "everything else"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "877a93ca-31c4-4585-9230-5df447270cd3",
+      "name": "Get FileType",
+      "type": "n8n-nodes-base.switch",
+      "position": [
+        -2080,
+        368
+      ],
+      "typeVersion": 3
+    },
+    {
+      "parameters": {
+        "fileSelector": "={{ $json.path }}",
+        "options": {}
+      },
+      "id": "5bb6f1a2-4945-4654-9f8d-1b1ae53ded5b",
+      "name": "Import File",
+      "type": "n8n-nodes-base.readWriteFile",
+      "position": [
+        -2240,
+        368
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "id": "5912622b-a012-467b-83b9-d3aa73428459",
+      "name": "Extract from PDF",
+      "type": "n8n-nodes-base.extractFromFile",
+      "position": [
+        -1888,
+        208
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operation": "ods",
+        "options": {}
+      },
+      "id": "89ae51a1-8ba0-4df0-a6ea-8646119b1f35",
+      "name": "Extract from DOCX",
+      "type": "n8n-nodes-base.extractFromFile",
+      "position": [
+        -1888,
+        368
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operation": "text",
+        "options": {}
+      },
+      "id": "d6bfaafc-e9cb-42e7-9663-7281ad2f5032",
+      "name": "Extract from TEXT",
+      "type": "n8n-nodes-base.extractFromFile",
+      "position": [
+        -1888,
+        528
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "chunkSize": 4000,
+        "options": {}
+      },
+      "id": "c31434de-a4dc-4d71-b757-3e8c382f62d7",
+      "name": "Summarization Chain",
+      "type": "@n8n/n8n-nodes-langchain.chainSummarization",
+      "position": [
+        -1360,
+        208
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "content": "## Step 1. Watch Folder and Import New Documents\n[Read more about Local File Trigger](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.localfiletrigger)\n\nWith n8n's local file trigger, we're able to trigger the workflow when files are created in our target folder. We still have to import them however as the trigger will only give the file's path. The \"Extract From\" node is used to get at the file's contents.",
+        "height": 694.0931000693263,
+        "width": 995.1475972814769,
+        "color": 7
+      },
+      "id": "ca5e8853-5394-40ae-99dc-f063958b6d53",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2496,
+        32
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Step 2. Summarise and Vectorise Document Contents\n[Learn more about using the Qdrant VectorStore](https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/n8n-nodes-langchain.vectorstoreqdrant)\n\nCapturing the document into our vector store is intended for a technique we'll use later known as Retrieval Augumented Generation or \"RAG\" for short. For our scenario, this allows our LLM to retrieve context more efficiently which produces better respsonses.",
+        "height": 949.8141899605673,
+        "width": 824.3300768713589,
+        "color": 7
+      },
+      "id": "35aaae37-5b74-4b96-9ec1-4cfd5282d86a",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1488,
+        16
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Step 3. Loop through Templates\n\nWe'll ask the LLM to help us generate 3 types of notes from the imported source document. These notes are intended to breakdown the content for faster study. Our templates for this demo are:\n(1) **Study guide**\n(2) **Briefing document**\n(3) **Timeline**",
+        "height": 485.0226378812345,
+        "width": 591.09953935829,
+        "color": 7
+      },
+      "id": "be44e4de-219e-4128-8cb5-8a12537f6c80",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -624,
+        96
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Step 4. Use AI Agents to Query and Generate Template Documents\n[Read more about using the Question & Answer Retrieval Chain](https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/n8n-nodes-langchain.chainretrievalqa)\n\nn8n allows us to easily use a chain of LLMs as agents which can work together to handle any task!\nHere the agents generate questions to explore the content of the source document and use the answers to generate the template. ",
+        "height": 806.6560661824452,
+        "width": 1500.7886103732135,
+        "color": 7
+      },
+      "id": "b137eda1-89f0-4859-8139-6c84c25a6b19",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        416
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Step 5. Export Generated Templates To Folder\n[Learn more about writing to the local filesystem](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.filesreadwrite)\n\nFinally, the AI generated documents can now be exported to disk. This workflow makes it easy to generate any kind of document from various source material and can be used for training and sales.",
+        "height": 384.22073222791266,
+        "width": 771.8710855215123,
+        "color": 7
+      },
+      "id": "64040b5b-1813-4e69-8535-c4fba343a048",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "qdrantCollection": {
+          "__rl": true,
+          "mode": "list",
+          "value": "storynotes",
+          "cachedResultName": "storynotes"
+        },
+        "options": {}
+      },
+      "id": "351927b8-6a1e-41c4-8169-757dd31c0832",
+      "name": "Qdrant Vector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "position": [
+        -1360,
+        496
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Try It Out! \n\n### This workflow automates generating notes from a source document.\n* It watches a target folder to pick up new files.\n* When a new file is detected, it saves the contents of the file in a vectorstore.\n* multiple AI agents guided by a templates list, generate the predetermined notes.\n* These notes are then export alongside the original source file for the user.\n",
+        "height": 289,
+        "width": 391
+      },
+      "id": "09df4615-05f7-42e2-9cde-b423b7ca2c43",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2928,
+        16
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=## document summary\n {{ $('Prep For AI').item.json.summary }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=Given the following document summary, what questions would you ask to create a {{ $('For Each Doc Type...').item.json.title }} for the document? Generate 5 questions."
+            }
+          ]
+        }
+      },
+      "id": "961edd40-283d-4392-8474-512207e36dda",
+      "name": "Interview",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "position": [
+        112,
+        624
+      ],
+      "typeVersion": 1.4
+    },
+    {
+      "parameters": {
+        "content": "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n### 💡Add your own templates here!\n",
+        "height": 295.46359440513226,
+        "width": 172.26820279743384
+      },
+      "id": "818c942c-a970-4b3b-8e96-cc7d384c3c08",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -608,
+        320
+      ],
+      "typeVersion": 1
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "2secs": {
+      "main": [
+        [
+          {
+            "node": "For Each Doc Type...",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Prep For AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Discover": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate": {
+      "main": [
+        [
+          {
+            "node": "2secs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Settings": {
+      "main": [
+        [
+          {
+            "node": "Import File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Generate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Interview": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Discover",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "To Binary": {
+      "main": [
+        [
+          {
+            "node": "Export to Folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Import File": {
+      "main": [
+        [
+          {
+            "node": "Get FileType",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prep For AI": {
+      "main": [
+        [
+          {
+            "node": "Get Doc Types",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get FileType": {
+      "main": [
+        [
+          {
+            "node": "Extract from PDF",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Extract from DOCX",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Extract from TEXT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Doc Types": {
+      "main": [
+        [
+          {
+            "node": "Split Out Doc Types",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from PDF": {
+      "main": [
+        [
+          {
+            "node": "Prep Incoming Doc",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from DOCX": {
+      "main": [
+        [
+          {
+            "node": "Prep Incoming Doc",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from TEXT": {
+      "main": [
+        [
+          {
+            "node": "Prep Incoming Doc",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prep Incoming Doc": {
+      "main": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Summarization Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qdrant Vector Store": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Split Out Doc Types": {
+      "main": [
+        [
+          {
+            "node": "For Each Doc Type...",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarization Chain": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "For Each Doc Type...": {
+      "main": [
+        [
+          {
+            "node": "Get Generated Documents",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Interview",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qdrant Vector Store1": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "Vector Store Retriever",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vector Store Retriever": {
+      "ai_retriever": [
+        [
+          {
+            "node": "Discover",
+            "type": "ai_retriever",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Generated Documents": {
+      "main": [
+        [
+          {
+            "node": "To Binary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Item List Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Interview",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Mistral Cloud": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mistral Cloud Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Interview",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Mistral Cloud1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Qdrant Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mistral Cloud Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Summarization Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mistral Cloud Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Discover",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mistral Cloud Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Generate",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1159ef80-d834-4e96-a178-b9c4225171f4",
+  "meta": {
+    "instanceId": "6ecec6629adf453df08d487fa10f1c287ae1bcb8e85c1bdf858a8203f602f7c6"
+  },
+  "id": "n4V7Jer5OmGg7u3V",
+  "tags": []
+}

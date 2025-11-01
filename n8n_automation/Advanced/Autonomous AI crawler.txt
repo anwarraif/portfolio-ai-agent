@@ -1,0 +1,1007 @@
+{
+  "name": "Autonomous AI crawler",
+  "nodes": [
+    {
+      "parameters": {
+        "name": "text_retrieval_tool",
+        "description": "Call this tool to return all text from the given website. Query should be full website URL.",
+        "source": "parameter",
+        "workflowJson": "{\n \"nodes\": [\n {\n \"parameters\": {},\n \"id\": \"05107436-c9cb-419b-ae8a-b74d309a130d\",\n \"name\": \"Execute workflow\",\n \"type\": \"n8n-nodes-base.manualTrigger\",\n \"typeVersion\": 1,\n \"position\": [\n 2220,\n 620\n ]\n },\n {\n \"parameters\": {\n \"assignments\": {\n \"assignments\": [\n {\n \"id\": \"253c2b17-c749-4f0a-93e8-5ff74f1ce49b\",\n \"name\": \"domain\",\n \"value\": \"={{ $json.query }}\",\n \"type\": \"string\"\n }\n ]\n },\n \"options\": {}\n },\n \"id\": \"bb8be616-3227-4705-8520-1827069faacd\",\n \"name\": \"Set domain\",\n \"type\": \"n8n-nodes-base.set\",\n \"typeVersion\": 3.3,\n \"position\": [\n 2440,\n 620\n ]\n },\n {\n \"parameters\": {\n \"assignments\": {\n \"assignments\": [\n {\n \"id\": \"ed0f1505-82b6-4393-a0d8-088055137ec9\",\n \"name\": \"domain\",\n \"value\": \"={{ $json.domain.startsWith(\\\"http\\\") ? $json.domain : \\\"http://\\\" + $json.domain }}\",\n \"type\": \"string\"\n }\n ]\n },\n \"options\": {}\n },\n \"id\": \"bdf29340-f135-489f-848e-1c7fa43a01df\",\n \"name\": \"Add protocool to domain\",\n \"type\": \"n8n-nodes-base.set\",\n \"typeVersion\": 3.3,\n \"position\": [\n 2640,\n 620\n ]\n },\n {\n \"parameters\": {\n \"assignments\": {\n \"assignments\": [\n {\n \"id\": \"2b1c7ff8-06a7-448b-99b7-5ede4b2e0bf0\",\n \"name\": \"response\",\n \"value\": \"={{ $json.data }}\",\n \"type\": \"string\"\n }\n ]\n },\n \"options\": {}\n },\n \"id\": \"9f0aa264-08c1-459a-bb99-e28599fe8f76\",\n \"name\": \"Set response\",\n \"type\": \"n8n-nodes-base.set\",\n \"typeVersion\": 3.3,\n \"position\": [\n 3300,\n 620\n ]\n },\n {\n \"parameters\": {\n \"url\": \"={{ $json.domain }}\",\n \"options\": {}\n },\n \"id\": \"cec7c8e8-bf5e-43d5-aa41-876293dbec78\",\n \"name\": \"Get website\",\n \"type\": \"n8n-nodes-base.httpRequest\",\n \"typeVersion\": 4.2,\n \"position\": [\n 2860,\n 620\n ]\n },\n {\n \"parameters\": {\n \"html\": \"={{ $json.data }}\",\n \"options\": {\n \"ignore\": \"a,img\"\n }\n },\n \"id\": \"1af94fcb-bca3-45c4-9277-18878c75d417\",\n \"name\": \"Convert HTML to Markdown\",\n \"type\": \"n8n-nodes-base.markdown\",\n \"typeVersion\": 1,\n \"position\": [\n 3080,\n 620\n ]\n }\n ],\n \"connections\": {\n \"Execute workflow\": {\n \"main\": [\n [\n {\n \"node\": \"Set domain\",\n \"type\": \"main\",\n \"index\": 0\n }\n ]\n ]\n },\n \"Set domain\": {\n \"main\": [\n [\n {\n \"node\": \"Add protocool to domain\",\n \"type\": \"main\",\n \"index\": 0\n }\n ]\n ]\n },\n \"Add protocool to domain\": {\n \"main\": [\n [\n {\n \"node\": \"Get website\",\n \"type\": \"main\",\n \"index\": 0\n }\n ]\n ]\n },\n \"Get website\": {\n \"main\": [\n [\n {\n \"node\": \"Convert HTML to Markdown\",\n \"type\": \"main\",\n \"index\": 0\n }\n ]\n ]\n },\n \"Convert HTML to Markdown\": {\n \"main\": [\n [\n {\n \"node\": \"Set response\",\n \"type\": \"main\",\n \"index\": 0\n }\n ]\n ]\n }\n },\n \"pinData\": {}\n}"
+      },
+      "id": "ccae0b5c-8e09-420d-bc21-ce3698c2e9ab",
+      "name": "Text",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "position": [
+        64,
+        688
+      ],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "name": "url_retrieval_tool",
+        "description": "Call this tool to return all URLs from the given website. Query should be full website URL.",
+        "source": "parameter",
+        "workflowJson": "{\n \"nodes\": [\n {\n \"parameters\": {},\n \"id\": \"05107436-c9cb-419b-ae8a-b74d309a130d\",\n \"name\": \"Execute workflow\",\n \"type\": \"n8n-nodes-base.manualTrigger\",\n \"typeVersion\": 1,\n \"position\": [\n 2200,\n 740\n ]\n },\n {\n \"parameters\": {\n \"operation\": \"extractHtmlContent\",\n \"extractionValues\": {\n \"values\": [\n {\n \"key\": \"output\",\n \"cssSelector\": \"a\",\n \"returnValue\": \"attribute\",\n \"returnArray\": true\n }\n ]\n },\n \"options\": {}\n },\n \"id\": \"1972e13e-d923-45e8-9752-e4bf45faaccf\",\n \"name\": \"Retrieve URLs\",\n \"type\": \"n8n-nodes-base.html\",\n \"typeVersion\": 1.2,\n \"position\": [\n 3060,\n 740\n ]\n },\n {\n \"parameters\": {\n \"fieldToSplitOut\": \"output\",\n \"options\": {}\n },\n \"id\": \"19703fbc-05ff-4d80-ab53-85ba6d39fc3f\",\n \"name\": \"Split out URLs\",\n \"type\": \"n8n-nodes-base.splitOut\",\n \"typeVersion\": 1,\n \"position\": [\n 3280,\n 740\n ]\n },\n {\n \"parameters\": {\n \"compare\": \"selectedFields\",\n \"fieldsToCompare\": \"href\",\n \"options\": {}\n },\n \"id\": \"5cc988e7-de9b-4177-b5e7-edb3842202c8\",\n \"name\": \"Remove duplicated\",\n \"type\": \"n8n-nodes-base.removeDuplicates\",\n \"typeVersion\": 1,\n \"position\": [\n 3720,\n 740\n ]\n },\n {\n \"parameters\": {\n \"assignments\": {\n \"assignments\": [\n {\n \"id\": \"04ced063-09f0-496c-9b28-b8095f9e2297\",\n \"name\": \"href\",\n \"value\": \"={{ $json.href.startsWith(\\\"/\\\") ? $('Add protocool to domain (URL)').item.json[\\\"domain\\\"] + $json.href : $json.href }}\",\n \"type\": \"string\"\n }\n ]\n },\n \"includeOtherFields\": true,\n \"include\": \"selected\",\n \"includeFields\": \"title\",\n \"options\": {}\n },\n \"id\": \"4715a25d-93a7-4056-8768-e3f886a1a0c9\",\n \"name\": \"Set domain to path\",\n \"type\": \"n8n-nodes-base.set\",\n \"typeVersion\": 3.3,\n \"position\": [\n 3940,\n 740\n ]\n },\n {\n \"parameters\": {\n \"conditions\": {\n \"options\": {\n \"caseSensitive\": true,\n \"leftValue\": \"\",\n \"typeValidation\": \"strict\"\n },\n \"conditions\": [\n {\n \"id\": \"d01ea6a8-7e75-40d4-98f2-25d42b245f36\",\n \"leftValue\": \"={{ $json.href.isUrl() }}\",\n \"rightValue\": \"\",\n \"operator\": {\n \"type\": \"boolean\",\n \"operation\": \"true\",\n \"singleValue\": true\n }\n }\n ],\n \"combinator\": \"and\"\n },\n \"options\": {}\n },\n \"id\": \"353deefb-ae69-440c-95b6-fdadacf4bf91\",\n \"name\": \"Filter out invalid URLs\",\n \"type\": \"n8n-nodes-base.filter\",\n \"typeVersion\": 2,\n \"position\": [\n 4160,\n 740\n ]\n },\n {\n \"parameters\": {\n \"aggregate\": \"aggregateAllItemData\",\n \"include\": \"specifiedFields\",\n \"fieldsToInclude\": \"title,href\",\n \"options\": {}\n },\n \"id\": \"9f87be8c-72d7-4ab1-b297-dc7069b2dd11\",\n \"name\": \"Aggregate URLs\",\n \"type\": \"n8n-nodes-base.aggregate\",\n \"typeVersion\": 1,\n \"position\": [\n 4380,\n 740\n ]\n },\n {\n \"parameters\": {\n \"conditions\": {\n \"options\": {\n \"caseSensitive\": true,\n \"leftValue\": \"\",\n \"typeValidation\": \"strict\"\n },\n \"conditions\": [\n {\n \"id\": \"5b9b7353-bd04-4af2-9480-8de135ff4223\",\n \"leftValue\": \"={{ $json.href }}\",\n \"rightValue\": \"\",\n \"operator\": {\n \"type\": \"string\",\n \"operation\": \"exists\",\n \"singleValue\": true\n }\n }\n ],\n \"combinator\": \"and\"\n },\n \"options\": {}\n },\n \"id\": \"35c8323a-5350-403a-9c2d-114b0527e395\",\n \"name\": \"Filter out empty hrefs\",\n \"type\": \"n8n-nodes-base.filter\",\n \"typeVersion\": 2,\n \"position\": [\n 3500,\n 740\n ]\n },\n {\n \"parameters\": {\n \"assignments\": {\n \"assignments\": [\n {\n \"id\": \"253c2b17-c749-4f0a-93e8-5ff74f1ce49b\",\n \"name\": \"domain\",\n \"value\": \"={{ $json.query }}\",\n \"type\": \"string\"\n }\n ]\n },\n \"options\": {}\n },\n \"id\": \"d9f6a148-6c8c-4a58-89f5-4e9cfcd8d910\",\n \"name\": \"Set domain (URL)\",\n \"type\": \"n8n-nodes-base.set\",\n \"typeVersion\": 3.3,\n \"position\": [\n 2400,\n 740\n ]\n },\n {\n \"parameters\": {\n \"assignments\": {\n \"assignments\": [\n {\n \"id\": \"ed0f1505-82b6-4393-a0d8-088055137ec9\",\n \"name\": \"domain\",\n \"value\": \"={{ $json.domain.startsWith(\\\"http\\\") ? $json.domain : \\\"http://\\\" + $json.domain }}\",\n \"type\": \"string\"\n }\n ]\n },\n \"options\": {}\n },\n \"id\": \"1f974444-da58-4a47-a9c3-ba3091fc1e96\",\n \"name\": \"Add protocool to domain (URL)\",\n \"type\": \"n8n-nodes-base.set\",\n \"typeVersion\": 3.3,\n \"position\": [\n 2620,\n 740\n ]\n },\n {\n \"parameters\": {\n \"url\": \"={{ $json.domain }}\",\n \"options\": {}\n },\n \"id\": \"31d7c7d4-8f61-402b-858d-63dd68ac69ee\",\n \"name\": \"Get website (URL)\",\n \"type\": \"n8n-nodes-base.httpRequest\",\n \"typeVersion\": 4.2,\n \"position\": [\n 2840,\n 740\n ]\n },\n {\n \"parameters\": {\n \"assignments\": {\n \"assignments\": [\n {\n \"id\": \"53c1c016-7983-4eba-a91d-da2a0523d805\",\n \"name\": \"response\",\n \"value\": \"={{ JSON.stringify($json.data) }}\",\n \"type\": \"string\"\n }\n ]\n },\n \"options\": {}\n },\n \"id\": \"f4b6df77-96be-4b12-9a8b-ae9b7009f13d\",\n \"name\": \"Set response (URL)\",\n \"type\": \"n8n-nodes-base.set\",\n \"typeVersion\": 3.3,\n \"position\": [\n 4600,\n 740\n ]\n }\n ],\n \"connections\": {\n \"Execute workflow\": {\n \"main\": [\n [\n {\n \"node\": \"Set domain (URL)\",\n \"type\": \"main\",\n \"index\": 0\n }\n ]\n ]\n },\n \"Retrieve URLs\": {\n \"main\": [\n [\n {\n \"node\": \"Split out URLs\",\n \"type\": \"main\",\n \"index\": 0\n }\n ]\n ]\n },\n \"Split out URLs\": {\n \"main\": [\n [\n {\n \"node\": \"Filter out empty hrefs\",\n \"type\": \"main\",\n \"index\": 0\n }\n ]\n ]\n },\n \"Remove duplicated\": {\n \"main\": [\n [\n {\n \"node\": \"Set domain to path\",\n \"type\": \"main\",\n \"index\": 0\n }\n ]\n ]\n },\n \"Set domain to path\": {\n \"main\": [\n [\n {\n \"node\": \"Filter out invalid URLs\",\n \"type\": \"main\",\n \"index\": 0\n }\n ]\n ]\n },\n \"Filter out invalid URLs\": {\n \"main\": [\n [\n {\n \"node\": \"Aggregate URLs\",\n \"type\": \"main\",\n \"index\": 0\n }\n ]\n ]\n },\n \"Aggregate URLs\": {\n \"main\": [\n [\n {\n \"node\": \"Set response (URL)\",\n \"type\": \"main\",\n \"index\": 0\n }\n ]\n ]\n },\n \"Filter out empty hrefs\": {\n \"main\": [\n [\n {\n \"node\": \"Remove duplicated\",\n \"type\": \"main\",\n \"index\": 0\n }\n ]\n ]\n },\n \"Set domain (URL)\": {\n \"main\": [\n [\n {\n \"node\": \"Add protocool to domain (URL)\",\n \"type\": \"main\",\n \"index\": 0\n }\n ]\n ]\n },\n \"Add protocool to domain (URL)\": {\n \"main\": [\n [\n {\n \"node\": \"Get website (URL)\",\n \"type\": \"main\",\n \"index\": 0\n }\n ]\n ]\n },\n \"Get website (URL)\": {\n \"main\": [\n [\n {\n \"node\": \"Retrieve URLs\",\n \"type\": \"main\",\n \"index\": 0\n }\n ]\n ]\n }\n },\n \"pinData\": {}\n}"
+      },
+      "id": "3cb5b768-1507-45d1-be9b-972809c48045",
+      "name": "URLs",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "position": [
+        240,
+        688
+      ],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o",
+        "options": {
+          "responseFormat": "json_object",
+          "temperature": 0
+        }
+      },
+      "id": "128c0bea-1c76-4d62-8feb-7e92c56d704e",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        -96,
+        688
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "openAiApi": {
+          "id": "Y1V5i3z8PcTFBtW6",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n \"type\": \"object\",\n \"properties\": {\n \"social_media\": {\n \"type\": \"array\",\n \"items\": {\n \"type\": \"object\",\n \"properties\": {\n \"platform\": {\n \"type\": \"string\",\n \"description\": \"The name of the social media platform (e.g., LinkedIn, Instagram)\"\n },\n \"urls\": {\n \"type\": \"array\",\n \"items\": {\n \"type\": \"string\",\n \"format\": \"uri\",\n \"description\": \"A URL for the social media platform\"\n }\n }\n },\n \"required\": [\"platform\", \"urls\"],\n \"additionalProperties\": false\n }\n }\n },\n \"required\": [\"platforms\"],\n \"additionalProperties\": false\n}\n"
+      },
+      "id": "545e6c6d-9afc-4054-ba5c-b39998d01515",
+      "name": "JSON Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [
+        400,
+        688
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ae484e44-36bc-4d88-9772-545e579a261c",
+              "name": "company_name",
+              "type": "string",
+              "value": "={{ $json.name }}"
+            },
+            {
+              "id": "c426ab19-649c-4443-aabb-eb0826680452",
+              "name": "company_website",
+              "type": "string",
+              "value": "={{ $json.website }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "eeec23bb-203f-4ed6-9fe4-bacaf5d3825c",
+      "name": "Map company name and website",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 3.3
+    },
+    {
+      "parameters": {},
+      "id": "1cd5ea9b-1760-4946-8df7-603db7c440e0",
+      "name": "Execute workflow",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        -864,
+        320
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "companies_input"
+      },
+      "id": "b6fad31c-16d3-4306-b4b4-0a6eafe043b3",
+      "name": "Get companies",
+      "type": "n8n-nodes-base.supabase",
+      "position": [
+        -624,
+        320
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "supabaseApi": {
+          "id": "cF8RWnwwGekli0zB",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": []
+        },
+        "includeOtherFields": true,
+        "include": "selected",
+        "includeFields": "name,website",
+        "options": {}
+      },
+      "id": "93616f65-6123-4f3e-813b-e74ac077e184",
+      "name": "Select company name and website",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -368,
+        320
+      ],
+      "typeVersion": 3.3
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a6e109b7-9333-44e8-aa13-590aeb91a56b",
+              "name": "social_media",
+              "type": "array",
+              "value": "={{ $json.output.social_media }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b21ab7bc-9e92-4138-a778-eecca958a15c",
+      "name": "Set social media array",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        400,
+        432
+      ],
+      "typeVersion": 3.3
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combinationMode": "mergeByPosition",
+        "options": {}
+      },
+      "id": "02b21db0-cc04-441c-90a7-29b7528f25e1",
+      "name": "Merge all data",
+      "type": "n8n-nodes-base.merge",
+      "position": [
+        640,
+        320
+      ],
+      "typeVersion": 2.1
+    },
+    {
+      "parameters": {
+        "tableId": "companies_output",
+        "dataToSend": "autoMapInputData"
+      },
+      "id": "4aa3a8ee-00c1-466c-ac75-08ab8ce5d0c0",
+      "name": "Insert new row",
+      "type": "n8n-nodes-base.supabase",
+      "position": [
+        864,
+        320
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "supabaseApi": {
+          "id": "cF8RWnwwGekli0zB",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "html": "={{ $json.data }}",
+        "options": {
+          "ignore": "a,img"
+        }
+      },
+      "id": "c40d53c5-9bb6-4153-b21d-331cec9ba0b2",
+      "name": "Convert HTML to Markdown",
+      "type": "n8n-nodes-base.markdown",
+      "position": [
+        704,
+        1024
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "",
+        "height": 166.55000000000004,
+        "width": 157.8125,
+        "color": 5
+      },
+      "id": "137d8162-1dc2-4012-b8d6-f3b9982f87f6",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        32,
+        640
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "",
+        "height": 166.55000000000004,
+        "width": 157.8125,
+        "color": 4
+      },
+      "id": "7a7f1ab2-39e6-4d5e-992b-ca4c75fd5b51",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        208,
+        640
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "### Text scraper tool\nThis tool is designed to return all text from the given webpage.\n\n💡 **Consider adding proxy for better crawling accuracy.**\n",
+        "height": 329.45390772033636,
+        "width": 1117.5005339977713,
+        "color": 5
+      },
+      "id": "84c56cbc-3325-4c02-9563-31476d93b8cd",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        32,
+        880
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "output",
+              "cssSelector": "a",
+              "returnValue": "attribute",
+              "returnArray": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f0cd73d9-1506-431a-b8ce-607914a0eca1",
+      "name": "Retrieve URLs",
+      "type": "n8n-nodes-base.html",
+      "position": [
+        720,
+        1408
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "output",
+        "options": {}
+      },
+      "id": "c76987e2-267a-42b3-8a29-1588f5a29013",
+      "name": "Split out URLs",
+      "type": "n8n-nodes-base.splitOut",
+      "position": [
+        944,
+        1408
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "compare": "selectedFields",
+        "fieldsToCompare": "href",
+        "options": {}
+      },
+      "id": "efb265a8-fb44-46a4-b46d-4a08c986b4ec",
+      "name": "Remove duplicated",
+      "type": "n8n-nodes-base.removeDuplicates",
+      "position": [
+        1392,
+        1408
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "04ced063-09f0-496c-9b28-b8095f9e2297",
+              "name": "href",
+              "type": "string",
+              "value": "={{ $json.href.startsWith(\"/\") ? $('Add protocool to domain (URL)').item.json[\"domain\"] + $json.href : $json.href }}"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "include": "selected",
+        "includeFields": "title",
+        "options": {}
+      },
+      "id": "362208a8-f29f-4be7-b231-c660ec39a1b6",
+      "name": "Set domain to path",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        1600,
+        1408
+      ],
+      "typeVersion": 3.3
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "d01ea6a8-7e75-40d4-98f2-25d42b245f36",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              },
+              "leftValue": "={{ $json.href.isUrl() }}",
+              "rightValue": ""
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "213cce0d-c12e-469c-8f8b-7f8a8e2f1f77",
+      "name": "Filter out invalid URLs",
+      "type": "n8n-nodes-base.filter",
+      "position": [
+        1824,
+        1408
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "include": "specifiedFields",
+        "fieldsToInclude": "title,href",
+        "options": {}
+      },
+      "id": "e6341ab0-1a1f-4eeb-ab66-81b69c6afb9c",
+      "name": "Aggregate URLs",
+      "type": "n8n-nodes-base.aggregate",
+      "position": [
+        2048,
+        1408
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "5b9b7353-bd04-4af2-9480-8de135ff4223",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              },
+              "leftValue": "={{ $json.href }}",
+              "rightValue": ""
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e6378d7e-8434-47b4-ac8d-233973b422bf",
+      "name": "Filter out empty hrefs",
+      "type": "n8n-nodes-base.filter",
+      "position": [
+        1168,
+        1408
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "253c2b17-c749-4f0a-93e8-5ff74f1ce49b",
+              "name": "domain",
+              "type": "string",
+              "value": "={{ $json.query }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "9d963528-ac66-41ac-b307-9bcbf4e09813",
+      "name": "Set domain (text)",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        64,
+        1024
+      ],
+      "typeVersion": 3.3
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ed0f1505-82b6-4393-a0d8-088055137ec9",
+              "name": "domain",
+              "type": "string",
+              "value": "={{ $json.domain.startsWith(\"http\") ? $json.domain : \"http://\" + $json.domain }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "96607534-d5eb-4fcd-bd72-caaf74465c26",
+      "name": "Add protocool to domain (text)",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        272,
+        1024
+      ],
+      "typeVersion": 3.3
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.domain }}",
+        "options": {}
+      },
+      "id": "417e91e7-5112-4706-a21d-1595ae13ee49",
+      "name": "Get website (text)",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        480,
+        1024
+      ],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2b1c7ff8-06a7-448b-99b7-5ede4b2e0bf0",
+              "name": "response",
+              "type": "string",
+              "value": "={{ $json.data }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "99d5823c-bdcd-4b81-83c3-0719b869432b",
+      "name": "Set response (text)",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        928,
+        1024
+      ],
+      "typeVersion": 3.3
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "253c2b17-c749-4f0a-93e8-5ff74f1ce49b",
+              "name": "domain",
+              "type": "string",
+              "value": "={{ $json.query }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e9296892-e6d1-4ec4-ae68-924d723337e2",
+      "name": "Set domain (URL)",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        64,
+        1408
+      ],
+      "typeVersion": 3.3
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.domain }}",
+        "options": {}
+      },
+      "id": "5b651b9b-2b38-4543-8c83-372a6ca86ca2",
+      "name": "Get website (URL)",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        512,
+        1408
+      ],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "53c1c016-7983-4eba-a91d-da2a0523d805",
+              "name": "response",
+              "type": "string",
+              "value": "={{ JSON.stringify($json.data) }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fc5cebb6-3037-425f-97fd-319489d993bc",
+      "name": "Set response (URL)",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        2272,
+        1408
+      ],
+      "typeVersion": 3.3
+    },
+    {
+      "parameters": {
+        "content": "### URL scraper tool\nThis tool is designed to return all links (URLs) from the given webpage.\n\n💡 **Consider adding proxy for better crawling accuracy.**",
+        "height": 328.79842054012374,
+        "width": 2467.2678721043376,
+        "color": 4
+      },
+      "id": "167e945c-aa71-4305-a5e8-e96f92f6b792",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        32,
+        1264
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "### Get companies from database\nRetrieve names and websites of companies from Supabase table to process crawling.\n\n💡 **You can replace Supabase with other database of your choice.**",
+        "height": 400.16865185185225,
+        "width": 221.7729148148145
+      },
+      "id": "f2b86055-b9fb-4c17-9f0b-2f53d2f18827",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -688,
+        112
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "### Set parameters for execution\nPass only `name` and `website` values from database. \n\n⚠️ **If you use other field namings, update this node.**",
+        "height": 370.14757037037066,
+        "width": 221.7729148148145
+      },
+      "id": "ae62a7cb-9363-421a-adeb-01b59a88c755",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -416,
+        144
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "### Crawling agent (retrieve social media profile links)\nCrawl website to extract social media profile links and return them in unified JSON format.\n\n💡 **You can change type of retrieved data by editing prompt and parser schema.**",
+        "height": 328.4957622370491,
+        "width": 339.7128777777775
+      },
+      "id": "866caca8-513c-48d9-8374-5003d500e9c6",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -48,
+        240
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "### Insert data to database\nAdd new rows in database table with extracted data.\n\n💡 **You can replace Supabase with other database of your choice.**",
+        "height": 364.786662962963,
+        "width": 221.7729148148145
+      },
+      "id": "935701ff-8a2e-4945-8c36-f6014120cc25",
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        800,
+        144
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ed0f1505-82b6-4393-a0d8-088055137ec9",
+              "name": "domain",
+              "type": "string",
+              "value": "={{ $json.domain.startsWith(\"http\") ? $json.domain : \"http://\" + $json.domain }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f71d2362-69c1-4931-8c5b-0ade114a07b9",
+      "name": "Add protocool to domain (URL)",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        288,
+        1408
+      ],
+      "typeVersion": 3.3
+    },
+    {
+      "parameters": {
+        "content": "## Autonomous AI crawler\nThis workflow autonomously navigates through given websites and retrieves social media profile links. \n\n💡 **You can modify this workflow to retrieve other type of data (e.g. contact details or company profile summary).**",
+        "height": 212.09880341753203,
+        "width": 369.93062670813185,
+        "color": 7
+      },
+      "id": "e0bc37cf-9d36-4139-9dfc-9997d5df3110",
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1408,
+        128
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Retrieve social media profile URLs from this website: {{ $json.website }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are an automated web crawler tasked with extracting social media URLs from a webpage provided by the user. You have access to a text retrieval tool to gather all text content from the page and a URL retrieval tool to identify and navigate through links on the page. Utilize the URLs retrieved to crawl additional pages. Your objective is to provide a unified JSON output containing the extracted data (links to all possible social media profiles from the website)."
+        }
+      },
+      "id": "d3b3c0ea-f8d5-43b3-b177-f547cc1bb43a",
+      "name": "Crawl website",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        0,
+        432
+      ],
+      "retryOnFail": true,
+      "typeVersion": 1.6
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Text": {
+      "ai_tool": [
+        [
+          {
+            "node": "Crawl website",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "URLs": {
+      "ai_tool": [
+        [
+          {
+            "node": "Crawl website",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "JSON Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Crawl website",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crawl website": {
+      "main": [
+        [
+          {
+            "node": "Set social media array",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get companies": {
+      "main": [
+        [
+          {
+            "node": "Select company name and website",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retrieve URLs": {
+      "main": [
+        [
+          {
+            "node": "Split out URLs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate URLs": {
+      "main": [
+        [
+          {
+            "node": "Set response (URL)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge all data": {
+      "main": [
+        [
+          {
+            "node": "Insert new row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split out URLs": {
+      "main": [
+        [
+          {
+            "node": "Filter out empty hrefs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute workflow": {
+      "main": [
+        [
+          {
+            "node": "Get companies",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set domain (URL)": {
+      "main": [
+        [
+          {
+            "node": "Add protocool to domain (URL)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get website (URL)": {
+      "main": [
+        [
+          {
+            "node": "Retrieve URLs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Crawl website",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove duplicated": {
+      "main": [
+        [
+          {
+            "node": "Set domain to path",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set domain (text)": {
+      "main": [
+        [
+          {
+            "node": "Add protocool to domain (text)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get website (text)": {
+      "main": [
+        [
+          {
+            "node": "Convert HTML to Markdown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set domain to path": {
+      "main": [
+        [
+          {
+            "node": "Filter out invalid URLs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter out empty hrefs": {
+      "main": [
+        [
+          {
+            "node": "Remove duplicated",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set social media array": {
+      "main": [
+        [
+          {
+            "node": "Merge all data",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Filter out invalid URLs": {
+      "main": [
+        [
+          {
+            "node": "Aggregate URLs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert HTML to Markdown": {
+      "main": [
+        [
+          {
+            "node": "Set response (text)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map company name and website": {
+      "main": [
+        [
+          {
+            "node": "Merge all data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add protocool to domain (URL)": {
+      "main": [
+        [
+          {
+            "node": "Get website (URL)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add protocool to domain (text)": {
+      "main": [
+        [
+          {
+            "node": "Get website (text)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Select company name and website": {
+      "main": [
+        [
+          {
+            "node": "Crawl website",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Map company name and website",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "ceaaf4e5-c74e-49da-900f-81cb9d28724b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6ecec6629adf453df08d487fa10f1c287ae1bcb8e85c1bdf858a8203f602f7c6"
+  },
+  "id": "ZqWZJFGBIczxAzIm",
+  "tags": []
+}
