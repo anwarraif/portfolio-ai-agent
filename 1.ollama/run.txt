@@ -1,0 +1,37 @@
+cd 1.ollama
+
+sudo su
+sudo apt update
+sudo apt install -y docker.io
+sudo systemctl enable docker --now
+
+docker build -t ollama-server .
+
+# versi CPU
+docker run -d \
+  --name ollama-server \
+  -p 11434:11434 \
+  -v ollama-data:/root/.ollama \
+  ollama-server
+
+# versi GPU
+docker run -d --name ollama-server-gpu \
+  --gpus all \
+  -p 11434:11434 \
+  -v ollama-data:/root/.ollama \
+  ollama-server
+
+docker ps
+
+docker exec -it ollama-server bash
+
+atau
+
+docker exec -it ollama-server-gpu bash
+
+ollama pull tinyllama:1.1b
+ollama pull deepseek-r1:1.5b
+
+ollama list
+
+ollama run tinyllama:1.1b

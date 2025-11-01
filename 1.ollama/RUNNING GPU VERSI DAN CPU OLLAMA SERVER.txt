@@ -1,0 +1,48 @@
+VERSI CPU :
+
+# 1. Hentikan container GPU jika sedang aktif
+docker stop ollama-server-gpu
+docker rm ollama-server-gpu
+
+# 2. Jalankan container CPU
+docker run -d --name ollama-server \
+  -p 11434:11434 \
+  -v ollama-data:/root/.ollama \
+  ollama/ollama:latest
+
+# 3. Pastikan container CPU aktif
+docker ps
+# Harus muncul "ollama-server" dengan status Up
+
+# 4. Masuk ke dalam container CPU
+docker exec -it ollama-server bash
+
+# 5. Jalankan Ollama dan cek model
+ollama list
+ollama run tinyllama
+
+VERSI GPU :
+# 1. Hentikan container CPU jika sedang aktif
+docker stop ollama-server
+docker rm ollama-server
+
+# 2. Jalankan container GPU
+docker run -d --name ollama-server-gpu \
+  --gpus all \
+  -p 11434:11434 \
+  -v ollama-data:/root/.ollama \
+  ollama/ollama:latest
+
+# 3. Pastikan container GPU aktif
+docker ps
+# Harus muncul "ollama-server-gpu" dengan status Up
+
+# 4. Masuk ke dalam container GPU
+docker exec -it ollama-server-gpu bash
+
+# 5. Cek GPU
+nvidia-smi
+
+# 6. Jalankan Ollama dan cek model pakai GPU
+ollama list
+ollama run tinyllama
