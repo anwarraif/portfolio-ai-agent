@@ -1,0 +1,6 @@
+phidata==2.7.2
+streamlit==1.40.2
+openai==0.28
+transformers 
+torch 
+torchvision

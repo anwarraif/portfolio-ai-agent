@@ -1,0 +1,553 @@
+[
+    {
+        "id": "asst_1xwOJwM9VWb24HZHPdsLwkJX",
+        "created_at": 1736589234,
+        "description": "Kamu adalah seorang CEO beberapa perusahaan di masa lalu dan memiliki banyak pengalaman dalam mengevaluasi proyek dan membuat keputusan strategis.",
+        "instructions": "\n                    Kamu adalah CEO berpengalaman yang mengevaluasi proyek. Ikuti langkah-langkah berikut dengan ketat:\n\n                    1. PERTAMA, gunakan alat AnalyzeProjectRequirements dengan:\n                        - project_name: Nama dari detail proyek\n                        - project_description: Deskripsi lengkap proyek\n                        - project_type: Jenis proyek (Aplikasi Web, Aplikasi Seluler, dll.)\n                        - budget_range: Rentang anggaran yang ditentukan\n\n                    2. TUNGGU hingga analisis selesai sebelum melanjutkan.\n                    \n                    3. Tinjau hasil analisis dan berikan rekomendasi strategis.\n                    ",
+        "metadata": {},
+        "model": "gpt-4o-2024-08-06",
+        "name": "Project Director",
+        "object": "assistant",
+        "tools": [
+            {
+                "function": {
+                    "name": "AnalyzeProjectRequirements",
+                    "description": "Correctly extracted `AnalyzeProjectRequirements` with all the required parameters with correct types",
+                    "parameters": {
+                        "properties": {
+                            "project_name": {
+                                "description": "Nama Proyek",
+                                "title": "Project Name",
+                                "type": "string"
+                            },
+                            "project_description": {
+                                "description": "Deskripsi dan tujuan proyek",
+                                "title": "Project Description",
+                                "type": "string"
+                            },
+                            "project_type": {
+                                "description": "Jenis proyek",
+                                "enum": [
+                                    "Aplikasi Web",
+                                    "Aplikasi Mobile",
+                                    "Pengembangan API",
+                                    "Analisis Data",
+                                    "Solusi AI/ML",
+                                    "Lainnya"
+                                ],
+                                "title": "Project Type",
+                                "type": "string"
+                            },
+                            "budget_range": {
+                                "description": "Rentang anggaran untuk proyek",
+                                "enum": [
+                                    "Rp150jt-Rp375jt",
+                                    "Rp375jt-Rp750jt",
+                                    "Rp750jt-Rp1.5M",
+                                    "Rp1.5M+"
+                                ],
+                                "title": "Budget Range",
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "budget_range",
+                            "project_description",
+                            "project_name",
+                            "project_type"
+                        ],
+                        "type": "object"
+                    },
+                    "strict": false
+                },
+                "type": "function"
+            },
+            {
+                "function": {
+                    "name": "SendMessage",
+                    "description": "Correctly extracted `SendMessage` with all the required parameters with correct types",
+                    "parameters": {
+                        "$defs": {
+                            "recipient": {
+                                "enum": [
+                                    "Technical Architect",
+                                    "Product Manager",
+                                    "Lead Developer",
+                                    "Client Success Manager"
+                                ],
+                                "title": "recipient",
+                                "type": "string"
+                            }
+                        },
+                        "properties": {
+                            "recipient": {
+                                "$ref": "#/$defs/recipient",
+                                "description": "Technical Architect: Senior Technical Architect dengan keahlian mendalam dalam desain sistem.\nProduct Manager: Product Manager berpengalaman yang berfokus pada keunggulan pengiriman.\nLead Developer: Senior developer dengan keahlian full-stack.\nClient Success Manager: Client Success Manager yang berfokus pada penyampaian proyek.\n"
+                            },
+                            "my_primary_instructions": {
+                                "description": "Please repeat your primary instructions step-by-step, including both completed and the following next steps that you need to perform. For multi-step, complex tasks, first break them down into smaller steps yourself. Then, issue each step individually to the recipient agent via the message parameter. Each identified step should be sent in a separate message. Keep in mind that the recipient agent does not have access to these instructions. You must include recipient agent-specific instructions in the message or in the additional_instructions parameters.",
+                                "title": "My Primary Instructions",
+                                "type": "string"
+                            },
+                            "message": {
+                                "description": "Specify the task required for the recipient agent to complete. Focus on clarifying what the task entails, rather than providing exact instructions. Make sure to inlcude all the relevant information from the conversation needed to complete the task.",
+                                "title": "Message",
+                                "type": "string"
+                            },
+                            "message_files": {
+                                "anyOf": [
+                                    {
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "type": "array"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ],
+                                "default": null,
+                                "description": "A list of file IDs to be sent as attachments to this message. Only use this if you have the file ID that starts with 'file-'.",
+                                "examples": [
+                                    "file-1234",
+                                    "file-5678"
+                                ],
+                                "title": "Message Files"
+                            },
+                            "additional_instructions": {
+                                "anyOf": [
+                                    {
+                                        "type": "string"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ],
+                                "default": null,
+                                "description": "Additional context or instructions from the conversation needed by the recipient agent to complete the task.",
+                                "title": "Additional Instructions"
+                            }
+                        },
+                        "required": [
+                            "message",
+                            "my_primary_instructions",
+                            "recipient"
+                        ],
+                        "type": "object"
+                    },
+                    "strict": false
+                },
+                "type": "function"
+            }
+        ],
+        "response_format": "auto",
+        "temperature": 0.7,
+        "tool_resources": {
+            "code_interpreter": null,
+            "file_search": null
+        },
+        "top_p": 1.0
+    },
+    {
+        "id": "asst_j8FrOdyGPDqzb87LOYfYIJrg",
+        "created_at": 1736589236,
+        "description": "Senior Technical Architect dengan keahlian mendalam dalam desain sistem.",
+        "instructions": "\n                    Kamu adalah seorang Technical Architect. Ikuti langkah-langkah berikut dengan ketat:\n\n                    1. TUNGGU analisis proyek selesai oleh CEO.\n\n                    2. Gunakan alat CreateTechnicalSpecification dengan:\n                        - architecture_type: Pilih dari monolitik/layanan mikro/tanpa server/hibrida\n                        - core_technologies: Cantumkan teknologi utama sebagai nilai yang dipisahkan koma\n                        - scalability_requirements: Pilih tinggi/sedang/rendah berdasarkan kebutuhan proyek\n\n                    3. Tinjau spesifikasi teknis dan berikan rekomendasi tambahan.\n                    ",
+        "metadata": {},
+        "model": "gpt-4o-2024-08-06",
+        "name": "Technical Architect",
+        "object": "assistant",
+        "tools": [
+            {
+                "function": {
+                    "name": "CreateTechnicalSpecification",
+                    "description": "Correctly extracted `CreateTechnicalSpecification` with all the required parameters with correct types",
+                    "parameters": {
+                        "properties": {
+                            "architecture_type": {
+                                "description": "Jenis arsitektur yang diusulkan",
+                                "enum": [
+                                    "monolithic",
+                                    "microservices",
+                                    "serverless",
+                                    "hybrid"
+                                ],
+                                "title": "Architecture Type",
+                                "type": "string"
+                            },
+                            "core_technologies": {
+                                "description": "Daftar teknologi dan framework utama (dipisahkan dengan koma)",
+                                "title": "Core Technologies",
+                                "type": "string"
+                            },
+                            "scalability_requirements": {
+                                "description": "Kebutuhan skalabilitas",
+                                "enum": [
+                                    "tinggi",
+                                    "sedang",
+                                    "rendah"
+                                ],
+                                "title": "Scalability Requirements",
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "architecture_type",
+                            "core_technologies",
+                            "scalability_requirements"
+                        ],
+                        "type": "object"
+                    },
+                    "strict": false
+                },
+                "type": "function"
+            },
+            {
+                "function": {
+                    "name": "SendMessage",
+                    "description": "Correctly extracted `SendMessage` with all the required parameters with correct types",
+                    "parameters": {
+                        "$defs": {
+                            "recipient": {
+                                "enum": [
+                                    "Lead Developer"
+                                ],
+                                "title": "recipient",
+                                "type": "string"
+                            }
+                        },
+                        "properties": {
+                            "recipient": {
+                                "$ref": "#/$defs/recipient",
+                                "description": "Lead Developer: Senior developer dengan keahlian full-stack.\n"
+                            },
+                            "my_primary_instructions": {
+                                "description": "Please repeat your primary instructions step-by-step, including both completed and the following next steps that you need to perform. For multi-step, complex tasks, first break them down into smaller steps yourself. Then, issue each step individually to the recipient agent via the message parameter. Each identified step should be sent in a separate message. Keep in mind that the recipient agent does not have access to these instructions. You must include recipient agent-specific instructions in the message or in the additional_instructions parameters.",
+                                "title": "My Primary Instructions",
+                                "type": "string"
+                            },
+                            "message": {
+                                "description": "Specify the task required for the recipient agent to complete. Focus on clarifying what the task entails, rather than providing exact instructions. Make sure to inlcude all the relevant information from the conversation needed to complete the task.",
+                                "title": "Message",
+                                "type": "string"
+                            },
+                            "message_files": {
+                                "anyOf": [
+                                    {
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "type": "array"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ],
+                                "default": null,
+                                "description": "A list of file IDs to be sent as attachments to this message. Only use this if you have the file ID that starts with 'file-'.",
+                                "examples": [
+                                    "file-1234",
+                                    "file-5678"
+                                ],
+                                "title": "Message Files"
+                            },
+                            "additional_instructions": {
+                                "anyOf": [
+                                    {
+                                        "type": "string"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ],
+                                "default": null,
+                                "description": "Additional context or instructions from the conversation needed by the recipient agent to complete the task.",
+                                "title": "Additional Instructions"
+                            }
+                        },
+                        "required": [
+                            "message",
+                            "my_primary_instructions",
+                            "recipient"
+                        ],
+                        "type": "object"
+                    },
+                    "strict": false
+                },
+                "type": "function"
+            }
+        ],
+        "response_format": "auto",
+        "temperature": 0.5,
+        "tool_resources": {
+            "code_interpreter": null,
+            "file_search": null
+        },
+        "top_p": 1.0
+    },
+    {
+        "id": "asst_zapSbofhE3aKXuVDrJoK0NBu",
+        "created_at": 1736589236,
+        "description": "Product Manager berpengalaman yang berfokus pada keunggulan pengiriman.",
+        "instructions": "\n                    - Mengelola cakupan dan jangka waktu proyek dengan memberikan peta jalan proyek\n                    - Menentukan persyaratan produk dan Anda harus memberikan produk dan fitur potensial yang dapat dibangun untuk perusahaan rintisan\n                    ",
+        "metadata": {},
+        "model": "gpt-4o-2024-08-06",
+        "name": "Product Manager",
+        "object": "assistant",
+        "tools": [
+            {
+                "function": {
+                    "name": "SendMessage",
+                    "description": "Correctly extracted `SendMessage` with all the required parameters with correct types",
+                    "parameters": {
+                        "$defs": {
+                            "recipient": {
+                                "enum": [
+                                    "Lead Developer",
+                                    "Client Success Manager"
+                                ],
+                                "title": "recipient",
+                                "type": "string"
+                            }
+                        },
+                        "properties": {
+                            "recipient": {
+                                "$ref": "#/$defs/recipient",
+                                "description": "Lead Developer: Senior developer dengan keahlian full-stack.\nClient Success Manager: Client Success Manager yang berfokus pada penyampaian proyek.\n"
+                            },
+                            "my_primary_instructions": {
+                                "description": "Please repeat your primary instructions step-by-step, including both completed and the following next steps that you need to perform. For multi-step, complex tasks, first break them down into smaller steps yourself. Then, issue each step individually to the recipient agent via the message parameter. Each identified step should be sent in a separate message. Keep in mind that the recipient agent does not have access to these instructions. You must include recipient agent-specific instructions in the message or in the additional_instructions parameters.",
+                                "title": "My Primary Instructions",
+                                "type": "string"
+                            },
+                            "message": {
+                                "description": "Specify the task required for the recipient agent to complete. Focus on clarifying what the task entails, rather than providing exact instructions. Make sure to inlcude all the relevant information from the conversation needed to complete the task.",
+                                "title": "Message",
+                                "type": "string"
+                            },
+                            "message_files": {
+                                "anyOf": [
+                                    {
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "type": "array"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ],
+                                "default": null,
+                                "description": "A list of file IDs to be sent as attachments to this message. Only use this if you have the file ID that starts with 'file-'.",
+                                "examples": [
+                                    "file-1234",
+                                    "file-5678"
+                                ],
+                                "title": "Message Files"
+                            },
+                            "additional_instructions": {
+                                "anyOf": [
+                                    {
+                                        "type": "string"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ],
+                                "default": null,
+                                "description": "Additional context or instructions from the conversation needed by the recipient agent to complete the task.",
+                                "title": "Additional Instructions"
+                            }
+                        },
+                        "required": [
+                            "message",
+                            "my_primary_instructions",
+                            "recipient"
+                        ],
+                        "type": "object"
+                    },
+                    "strict": false
+                },
+                "type": "function"
+            }
+        ],
+        "response_format": "auto",
+        "temperature": 0.4,
+        "tool_resources": {
+            "code_interpreter": null,
+            "file_search": null
+        },
+        "top_p": 1.0
+    },
+    {
+        "id": "asst_iZwoqRO9kxobTHm4TLsnn34G",
+        "created_at": 1736589237,
+        "description": "Senior developer dengan keahlian full-stack.",
+        "instructions": "\n                    - Merencanakan implementasi teknis\n                    - Menyediakan estimasi upaya\n                    - Meninjau kelayakan teknis\n                    ",
+        "metadata": {},
+        "model": "gpt-4o-2024-08-06",
+        "name": "Lead Developer",
+        "object": "assistant",
+        "tools": [],
+        "response_format": "auto",
+        "temperature": 0.3,
+        "tool_resources": {
+            "code_interpreter": null,
+            "file_search": null
+        },
+        "top_p": 1.0
+    },
+    {
+        "id": "asst_MAoYU1kcXG6Sx6BAkBrMmBS7",
+        "created_at": 1736589238,
+        "description": "Client Success Manager yang berfokus pada penyampaian proyek.",
+        "instructions": "\n                    - Memastikan kepuasan klien\n                    - Kelola ekspektasi\n                    - Menangani umpan balik\n                    ",
+        "metadata": {},
+        "model": "gpt-4o-2024-08-06",
+        "name": "Client Success Manager",
+        "object": "assistant",
+        "tools": [],
+        "response_format": "auto",
+        "temperature": 0.6,
+        "tool_resources": {
+            "code_interpreter": null,
+            "file_search": null
+        },
+        "top_p": 1.0
+    },
+    {
+        "id": "asst_nE2XLl8zHvcuN4dZb2dmWv1c",
+        "created_at": 1737181200,
+        "description": "Seorang CEO berpengalaman yang menganalisis proyek dan membuat keputusan strategis.",
+        "instructions": "\n                    Anda adalah CEO berpengalaman. Ikuti langkah berikut:\n\n                    1. Gunakan alat AnalisisKebutuhanProyek dengan parameter berikut:\n                       - nama_proyek: Nama dari detail proyek\n                       - deskripsi_proyek: Deskripsi penuh proyek\n                       - jenis_proyek: Jenis proyek (Aplikasi Web, Aplikasi Mobile, dll)\n                       - kisaran_anggaran: Kisaran anggaran yang ditentukan\n\n                    2. Tunggu hasil analisis selesai sebelum melanjutkan.\n                    \n                    3. Tinjau hasil analisis dan berikan rekomendasi strategis.\n                    ",
+        "metadata": {},
+        "model": "gpt-4o-2024-08-06",
+        "name": "Direktur Proyek",
+        "object": "assistant",
+        "tools": [
+            {
+                "function": {
+                    "name": "AnalisisKebutuhanProyek",
+                    "description": "Correctly extracted `AnalisisKebutuhanProyek` with all the required parameters with correct types",
+                    "parameters": {
+                        "properties": {
+                            "nama_proyek": {
+                                "description": "Nama proyek",
+                                "title": "Nama Proyek",
+                                "type": "string"
+                            },
+                            "deskripsi_proyek": {
+                                "description": "Deskripsi dan tujuan proyek",
+                                "title": "Deskripsi Proyek",
+                                "type": "string"
+                            },
+                            "jenis_proyek": {
+                                "description": "Jenis proyek",
+                                "enum": [
+                                    "Aplikasi Web",
+                                    "Aplikasi Mobile",
+                                    "Pengembangan API",
+                                    "Analitik Data",
+                                    "Solusi AI/ML",
+                                    "Lainnya"
+                                ],
+                                "title": "Jenis Proyek",
+                                "type": "string"
+                            },
+                            "kisaran_anggaran": {
+                                "description": "Kisaran anggaran untuk proyek",
+                                "enum": [
+                                    "Rp150 juta-Rp375 juta",
+                                    "Rp375 juta-Rp750 juta",
+                                    "Rp750 juta-Rp1,5 miliar",
+                                    "Rp1,5 miliar+"
+                                ],
+                                "title": "Kisaran Anggaran",
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "deskripsi_proyek",
+                            "jenis_proyek",
+                            "kisaran_anggaran",
+                            "nama_proyek"
+                        ],
+                        "type": "object"
+                    },
+                    "strict": false
+                },
+                "type": "function"
+            }
+        ],
+        "response_format": "auto",
+        "temperature": 0.7,
+        "tool_resources": {
+            "code_interpreter": null,
+            "file_search": null
+        },
+        "top_p": 1.0
+    },
+    {
+        "id": "asst_tjKrO1vYsxtuhTWQg8lG2Fdz",
+        "created_at": 1737181200,
+        "description": "Arsitek teknis senior dengan keahlian mendalam dalam desain sistem.",
+        "instructions": "\n                    Anda adalah arsitek teknis. Ikuti langkah berikut:\n\n                    1. Tunggu analisis proyek selesai oleh CEO.\n                    \n                    2. Gunakan alat BuatSpesifikasiTeknis dengan:\n                       - jenis_arsitektur: Pilih dari monolitik/microservices/serverless/hybrid\n                       - teknologi_utama: Daftar teknologi utama sebagai nilai koma-pisah\n                       - kebutuhan_skalabilitas: Pilih tinggi/sedang/rendah sesuai kebutuhan proyek\n\n                    3. Tinjau spesifikasi teknis dan berikan rekomendasi tambahan.\n                    ",
+        "metadata": {},
+        "model": "gpt-4o-2024-08-06",
+        "name": "Arsitek Teknis",
+        "object": "assistant",
+        "tools": [
+            {
+                "function": {
+                    "name": "BuatSpesifikasiTeknis",
+                    "description": "Correctly extracted `BuatSpesifikasiTeknis` with all the required parameters with correct types",
+                    "parameters": {
+                        "properties": {
+                            "jenis_arsitektur": {
+                                "description": "Jenis arsitektur yang diusulkan",
+                                "enum": [
+                                    "monolitik",
+                                    "microservices",
+                                    "serverless",
+                                    "hybrid"
+                                ],
+                                "title": "Jenis Arsitektur",
+                                "type": "string"
+                            },
+                            "teknologi_utama": {
+                                "description": "Daftar teknologi dan framework utama yang dipisahkan dengan koma",
+                                "title": "Teknologi Utama",
+                                "type": "string"
+                            },
+                            "kebutuhan_skalabilitas": {
+                                "description": "Kebutuhan skalabilitas",
+                                "enum": [
+                                    "tinggi",
+                                    "sedang",
+                                    "rendah"
+                                ],
+                                "title": "Kebutuhan Skalabilitas",
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "jenis_arsitektur",
+                            "kebutuhan_skalabilitas",
+                            "teknologi_utama"
+                        ],
+                        "type": "object"
+                    },
+                    "strict": false
+                },
+                "type": "function"
+            }
+        ],
+        "response_format": "auto",
+        "temperature": 0.5,
+        "tool_resources": {
+            "code_interpreter": null,
+            "file_search": null
+        },
+        "top_p": 1.0
+    }
+]
